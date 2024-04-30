@@ -1,4 +1,4 @@
-1.	To extend the MDS job (First, create a directory with the name of the run job that is, either jobname run1 or run2 or run3
+1.	To extend the MDS job (First, create a directory with the name of the run job that is, either jobname run1 or run2 or run3)
 module purge
 module add chpc/schrodinger/2022-1
 module add chpc/cuda/10.1
