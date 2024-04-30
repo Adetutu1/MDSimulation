@@ -1,0 +1,35 @@
+1.	To extend the MDS job (First, create a directory with the name of the run job that is, either jobname run1 or run2 or run3
+module purge
+module add chpc/schrodinger/2022-1
+module add chpc/cuda/10.1
+env SCHRODINGER_CUDA_VISIBLE_DEVICES="1"
+$SCHRODINGER/desmond -JOBNAME desmond_md_job_ZINC000670449238_run3 -HOST 'gpu_1' -PROCS 1 -restore /mnt/lustre/users/aakinnuwesi/mdsimulation2/desmond_md_job_ZINC000670449238_run2/desmond_md_job_ZINC000670449238_run2.cpt -in /mnt/lustre/users/aakinnuwesi/mdsimulation2/desmond_md_job_ZINC000670449238_run2/desmond_md_job_ZINC000670449238-in.cms -cfg mdsim.last_time=225000.0 -QARG "-P CBBI1154 -l walltime=12:00:00 -l select=1:ncpus=1:ngpus=1"
+
+2.	Merge all the runs together.
+mkdir merged_ZINC000670449238
+For example, merging MDSimulation runs (50ns + 50ns)
+a.	ssh login1
+b.	create a directory (merge_ZINC000670471434)
+c.	move the folder of the first mdrun(50ns) and the second mdrun (50ns) into the directory created. 
+cp -r ./desmond_md_job_ZINC000670471434/. ./merge_ZINC000670471434/
+cp -r ./desmond_md_job_ZINC000670471434_run2/. ./merge_ZINC000670471434/
+d.	module purge
+e.	module load chpc/schrodinger/2022-1
+f.	$SCHRODINGER/run trj_merge.py desmond_md_job_ZINC000670471434-out.cms desmond_md_job_ZINC000670471434_trj desmond_md_job_ZINC000670471434_run2_trj -o merge_ZINC000670471434
+g.	Download the out.cms file (merge_ZINC000670471434-out.cms) and the trj folder (merge_ZINC000670471434_trj) generated to your local folder
+h.	Open the maestro simulation interaction diagram
+i.	Load the merge_ZINC000670471434-out.cms to generate .eaf file that we be used for plots on maestro.
+
+3.	To generate .eaf file that will be used for result analysis
+mkdir result_data
+module purge
+module load chpc/schrodinger/2022-1
+$SCHRODINGER/run event_analysis.py analyze -prot "(protein)" -lig "auto" -out merged_ZINC000670449238 merge_ZINC000670449238-out.cms
+
+4.	To analysis the MDS result from the merged directory and .eaf output 
+$SCHRODINGER/run analyze_simulation.py merge_ZINC000670449238-out.cms merge_ZINC000670449238_trj merge_ZINC000670449238-out.eaf merge_ZINC000670449238-in.eaf -HOST "gpu_1" -TMPLAUNCHDIR -QARG "-P CBBI1154 -l walltime=2:00:00 -l select=1:ncpus=1:ngpus=1" -JOBNAME "merge_analysis"
+
+5.	To plot graph and generate pdf files from the result analysis
+mkdir data_run1
+$SCHRODINGER/run event_analysis.py report -pdf /mnt/lustre/users/aakinnuwesi/mdsimulation2/merge_ZINC000670449238/data_run1/merge_ZINC000670449238.pdf -data -plots -data_dir /mnt/lustre/users/aakinnuwesi/mdsimulation2/merge_ZINC000670449238/data_run1/ desmond_md_job_ZINC000670449238-out.eaf
+
