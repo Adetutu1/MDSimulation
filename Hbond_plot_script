@@ -1,0 +1,80 @@
+# Hydrogen bond plot from the pl-contacts-Hbond.dat generated from Desmond MD Simualtion
+#For x-axis in hundreds (100, 200, 300, 400, 500)
+
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Set file path (Update with your actual file location)
+file_path <- "C:/Users/Boluwaji Akinnuwesi/Documents/r_hbond/Pl_contacts_hbond.csv"
+
+# Read the CSV file
+df <- read.csv(file_path, header = TRUE, stringsAsFactors = FALSE)
+
+# Ensure column names are correct (Update if necessary)
+colnames(df) <- c("Time", "Residue", "Chain", "ResName", "AtomName", "LigandFragment", "LigandAtomName")
+
+# Count the number of hydrogen bonds per time point
+hbonds_per_time <- df %>%
+  group_by(Time) %>%
+  summarise(Hydrogen_Bond_Count = n())
+
+# Create a new variable that represents time in hundreds
+hbonds_per_time$Time_Hundreds <- hbonds_per_time$Time / 10
+
+# Generate the updated plot
+ggplot(hbonds_per_time, aes(x = Time_Hundreds, y = Hydrogen_Bond_Count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Time (ps)", y = "Number of Hydrogen Bonds") +  # x-axis label remains Time (ps)
+  scale_x_continuous(
+    breaks = seq(0, max(hbonds_per_time$Time_Hundreds), by = 100),  # Use hundreds
+    expand = expansion(mult = c(0.01, 0.05))
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    axis.line.x = element_line(color = "black", size = 0.5),
+    axis.line.y = element_line(color = "black", size = 0.5),
+    plot.margin = margin(10, 20, 10, 10)
+  )
+
+
+
+#For x-axis in thousands (1000, 2000, 3000, 4000, 5000)
+
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Set file path (Update with your actual file location)
+file_path <- "C:/Users/Boluwaji Akinnuwesi/Documents/r_hbond/Pl_contacts_hbond.csv"
+
+# Read the CSV file
+df <- read.csv(file_path, header = TRUE, stringsAsFactors = FALSE)
+
+# Ensure column names are correct (Update if necessary)
+colnames(df) <- c("Time", "Residue", "Chain", "ResName", "AtomName", "LigandFragment", "LigandAtomName")
+
+# Count the number of hydrogen bonds per time point
+hbonds_per_time <- df %>%
+  group_by(Time) %>%
+  summarise(Hydrogen_Bond_Count = n())
+
+# Generate the updated plot
+ggplot(hbonds_per_time, aes(x = Time, y = Hydrogen_Bond_Count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Time (ps)", y = "Number of Hydrogen Bonds") +  # Updated x-axis label to include (ps)
+  scale_x_continuous(expand = expansion(mult = c(0.01, 0.05))) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    axis.line.x = element_line(color = "black", size = 0.5),
+    axis.line.y = element_line(color = "black", size = 0.5),
+    plot.margin = margin(10, 20, 10, 10)
+  )
